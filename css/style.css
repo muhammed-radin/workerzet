@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Cousine:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+
+#editor {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: calc(100vh - 125px) !important;
+}
+
+@media (max-width: 768px) {
+  #fileMenu {
+    width: 80%;
+  }
+}
+
+.editor-container {
+  overflow: scroll;
+  height: calc(100vh - 120px) !important;
+}
+
+#settingsMenu {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+#aiModal textarea {
+  resize: none;
+}
+
+/* Base Styles */
+body {
+  font-family: monospace, system-ui, sans-serif;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2d3748;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
+
+/* Editor Container */
+.editor-container {
+  height: calc(100% - 40px);
+  background: #282c34;
+}
+
+/* Modals */
+.ai-modal-backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.ai-modal-content {
+  background: #2d3748;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.settings-menu {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3),
+    0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+}
+
+/* File Explorer */
+.file-item {
+  transition: background-color 0.2s ease;
+}
+
+.file-item:hover {
+  background-color: #374151;
+}
+
+/* Mobile Overrides */
+@media (max-width: 768px) {
+  #fileMenu {
+    width: 85%;
+  }
+  
+  .editor-container {
+    height: calc(100% - 76px);
+  }
+  
+  .footer-button-text {
+    display: none;
+  }
+}
+
+/* Ace Editor Overrides */
+.ace_gutter {
+  background: #1a1d24 !important;
+  border-right: 1px solid #373c49 !important;
+}
+
+.ace_active-line {
+  background: #2c313a !important;
+}
+
+/* Animation */
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Utility Classes */
+.hover-opacity {
+  transition: opacity 0.2s ease;
+}
+
+.hover-opacity:hover {
+  opacity: 0.8;
+}
+
+
+
+
+
+
+
+
+
+
+::-webkit-scrollbar {
+  display: none;
+}

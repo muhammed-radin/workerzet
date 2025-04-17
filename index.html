@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkerZet - AI Code Workspace</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/ionicons/7.4.0/ionicons/ionicons.esm.js"></script>
+  <script nomodule="" src="https://cdnjs.cloudflare.com/ajax/libs/ionicons/7.4.0/ionicons/ionicons.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/ace.js"></script>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.6/theme/one_dark.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body class="bg-gray-900 text-gray-100 h-screen flex flex-col overflow-hidden">
+  <!-- Navbar -->
+  <nav class="bg-gray-800 px-2 py-1 flex items-center justify-between border-b border-gray-700">
+    <div class="flex items-center space-x-3">
+      <button id="menuToggle" class="p-2 hover:bg-gray-700 rounded-lg transition-colors">
+        <ion-icon name="folder-open-outline" class="text-xl"></ion-icon>
+      </button>
+      <div class="flex items-center space-x-2">
+        <img src="logo.png" alt="WorkerZet" class="h-7 w-auto hidden md:block">
+        <span class="text-md font-semibold md:hidden">WorkerZet</span>
+      </div>
+    </div>
+    
+    <div class="flex items-center space-x-3">
+      <input type="text" class="bg-gray-700 px-4 py-1.5 rounded-md hidden md:block w-48 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Project Name" value="Untitled Project">
+      <button id="aiPrompt" class="p-2 hover:bg-gray-700 rounded-lg transition-colors">
+        <ion-icon name="sparkles-outline" class="text-md"></ion-icon>
+      </button>
+      <button id="settingsToggle" class="p-2 hover:bg-gray-700 rounded-lg transition-colors">
+        <ion-icon name="settings-outline" class="text-md"></ion-icon>
+      </button>
+    </div>
+  </nav>
+  
+  <!-- AI Prompt Modal -->
+  <div id="aiModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+    <div class="bg-gray-800 rounded-lg p-6 max-w-2xl mx-auto mt-20">
+      <h3 class="text-lg font-semibold mb-4">AI Prompt</h3>
+      <textarea class="bg-gray-700 w-full p-3 rounded-md mb-4 h-48" placeholder="Enter your AI prompt..."></textarea>
+      <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md float-right">Generate</button>
+    </div>
+  </div>
+  
+  <!-- Settings Modal -->
+  <div id="settingsMenu" class="hidden absolute right-4 top-16 bg-gray-800 p-4 rounded-lg w-80 border border-gray-700 z-[999]">
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm mb-1">Project Title</label>
+        <input type="text" class="bg-gray-700 w-full px-3 py-2 rounded-md">
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Description</label>
+        <textarea class="bg-gray-700 w-full px-3 py-2 rounded-md h-24"></textarea>
+      </div>
+      <button id="saveSettings" class="bg-blue-600 hover:bg-blue-700 w-full py-2 rounded-md">
+        Save Settings
+      </button>
+    </div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="flex-1 flex overflow-hidden">
+    <!-- Left Sidebar -->
+    <div id="fileMenu" class="bg-gray-800 w-64 fixed md:relative transform -translate-x-full md:translate-x-0 
+            transition-transform duration-300 h-full z-10 border-r border-gray-700">
+      <div class="p-3">
+        <h3 class="text-md font-semibold mb-3 px-2">File Explorer</h3>
+        <div class="space-y-1 scroll-y h-[calc(80vh-3px)] overflow-scroll file_container">
+          <div class="flex items-center space-x-3 px-3 py-2 hover:bg-gray-700 rounded-lg cursor-pointer .file-item">
+            <ion-icon name="document-outline" class="text-base"></ion-icon>
+            <span class="text-sm">index.html</span>
+          </div>
+          <div class="flex items-center space-x-3 px-3 py-2 hover:bg-gray-700 rounded-lg cursor-pointer">
+            <ion-icon name="folder-open-outline" class="text-base"></ion-icon>
+            <span class="text-sm">js</span>
+          </div>
+          <div class="flex items-center space-x-3 px-3 py-2 hover:bg-gray-700 rounded-lg cursor-pointer">
+            <ion-icon name="folder-open-outline" class="text-base"></ion-icon>
+            <span class="text-sm">css</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Editor Area -->
+    <div class="flex-1 flex flex-col">
+      <!-- Tabs -->
+      <div class="bg-gray-800 border-b border-gray-700">
+        <div class="flex overflow-x-auto px-2 py-1.5">
+          <div class="flex space-x-1 overflow-x-auto w-screen min-h-3" id="tabs">
+            <button class="bg-gray-700 px-4 py-2 rounded-md flex items-center space-x-2 hover:bg-gray-600 transition-colors">
+              <ion-icon name="document-outline" class="text-sm"></ion-icon>
+              <span class="text-sm">index.html</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Editor Container -->
+      <div class="editor-container flex-1 relative">
+        <div id="editor" class="absolute inset-0"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Updated Footer -->
+  <footer class="bg-gray-800 px-4 py-2.5 flex items-center justify-between text-sm border-t border-gray-700 absolute bottom-0 left-0 w-screen z-[999]">
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2">
+        <ion-icon name="wifi-outline" class="text-base"></ion-icon>
+        <span class="hidden md:inline">Connected</span>
+      </div>
+      <button class="flex items-center space-x-2 hover:bg-gray-700 px-2 py-1 rounded-md" id="ConsoleIt">
+        <ion-icon name="terminal-outline" class="text-base"></ion-icon>
+        <span></span>
+      </button>
+    </div>
+    <div class="flex items-center space-x-4">
+      <button class="flex items-center space-x-2 hover:bg-gray-700 px-2 py-1 rounded-md" id="DownloadIt">
+        <ion-icon name="download-outline" class="text-base"></ion-icon>
+        <span></span>
+      </button>
+      <button class="flex items-center space-x-2 hover:bg-gray-700 px-2 py-1 rounded-md" id="CommentIt">
+        <ion-icon name="sparkles-outline" class="text-base"></ion-icon>
+        <span>Comment</span>
+      </button>
+    </div>
+  </footer>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/ext-language_tools.js"></script>
+  
+  <script src="js/evt.js"></script>
+  <script src="js/tag.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/str.js"></script>
+  <script src="js/sse.js"></script>
+  <script src="js/tabs.js"></script>
+  <script src="js/files.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
