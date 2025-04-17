@@ -248,7 +248,7 @@ function openPrompt() {
     document.body.appendChild(modal);
   });
 }
-/*
+
 openPrompt().then((opt) => {
   genProject(opt.title, opt.description, opt.goal)
   
@@ -257,4 +257,4 @@ openPrompt().then((opt) => {
       downloadFile(blob)
     })
   }
-})*/
+})
