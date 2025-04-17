@@ -10,7 +10,7 @@ const api = {
     
   },
   currentHistory: [],
-  post(prompt, system = null, model = "openai", pushHis = true) {
+  post(prompt, system = null, model = "openai-large", pushHis = true) {
     return new Promise((resolve, reject) => {
       
       let xhr = new XMLHttpRequest()
