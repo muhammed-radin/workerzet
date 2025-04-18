@@ -3,16 +3,17 @@ const api = {
     let pr = encodeURIComponent(prompt);
     let sys = encodeURIComponent(system);
     let modelParam = model ? "&model=" + model : ""
-    
-    let res = await fetch('https://text.pollinations.ai/' + pr + "?system=" + encodeURIComponent(sys) + modelParam + "&private=true" + extParams);
+
+    let res = await fetch('https://text.pollinations.ai/' + pr + "?system=" + encodeURIComponent(sys) + modelParam +
+      "&private=true" + extParams);
     let txt = await res.text()
     return await txt;
-    
+
   },
   currentHistory: [],
   post(prompt, system = null, model = "openai-large", pushHis = true) {
     return new Promise((resolve, reject) => {
-      
+
       let xhr = new XMLHttpRequest()
       xhr.open('POST', "https://text.pollinations.ai/openai")
       xhr.addEventListener('readystatechange', () => {
@@ -23,27 +24,27 @@ const api = {
           resolve(json.choices[0].message.content)
         }
       })
-      
+
       let history = []
-      
+
       if (system) {
         history.push({
           role: 'system',
           content: system
         })
       }
-      
+
       history.push({
         role: 'user',
         content: prompt,
       })
-      
-      
+
+
       let currentHistory = api.currentHistory.concat(history);
       if (pushHis) {
         api.currentHistory = currentHistory;
       }
-      
+
       xhr.setRequestHeader('Content-Type', 'application/json')
       xhr.send(JSON.stringify({
         "model": model,
@@ -155,7 +156,7 @@ Explanation: This prompt enforces a two-part response - first a textual project 
      \`\`\`json
      {
        "structure": [
-         { "name": "filename", "type": "file|folder", "mimeType": "type/subtype" }
+         { "name": "filename", "type": "file|folder", "mimeType": "type/subtype", "des": "file description", "contents": []( for folders only) }
        ],
        "dependencies": {
          "npm": ["package@version"],
@@ -179,7 +180,8 @@ Explanation: This prompt enforces a two-part response - first a textual project 
    \`\`\`json
    {
      "structure": [
-       { "name": "src/index.js", "type": "file", "mimeType": "text/javascript" },
+       { "name": "index.js", "type": "file", "mimeType": "text/javascript", "contents": [
+          { "name": "index.js", "type": "file", "mimeType": "text/javascript" }] },
        { "name": ".eslintrc.json", "type": "file", "mimeType": "application/json" }
      ],
      "dependencies": {
@@ -222,3 +224,4 @@ For every input prompt you receive:
 
 Your enhanced prompts consistently yield higher quality, more precise, and more useful outputs from AI systems. You automatically adapt to different domains and prompt types while maintaining rigorous optimization standards.`
 }
+

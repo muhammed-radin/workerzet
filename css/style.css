@@ -2,12 +2,14 @@
 
 
 #editor {
-  position: absolute;
+  position: relative;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  height: calc(100vh - 125px) !important;
+  overflow: scroll;
+  height: calc(100vh - 230px) !important;
+  max-height: calc(100vh - 230px) !important;
 }
 
 @media (max-width: 768px) {
@@ -17,8 +19,7 @@
 }
 
 .editor-container {
-  overflow: scroll;
-  height: calc(100vh - 120px) !important;
+  max-height: calc(100vh - 180px) !important;
 }
 
 #settingsMenu {

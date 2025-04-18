@@ -132,35 +132,55 @@ async function asyncMap(array, asyncCallback) {
 }
 
 
-function genProject(title, des, target) {
-  api.post(`Create new project with given details from user. \n Title: ${title} \n Description: ${des} \n Target: ${target}`,
-    api.PROMPT_ENHANCE_PROMPT).then((prmpt) => {
-    audio.play(audio.HINT)
-    api.post(prmpt, api.PROMPT_PLAN_GEN).then(function(txt) {
-      var jsonCode = convertMdCodeBlocksToJson(txt)[0].code;
-      jsonCode = '[' + jsonCode;
-      editor.setValue(jsonCode);
-      let files = JSON.parse(jsonCode);
+function genProjectContinue(prmpt) {
+  audio.play(audio.HINT)
+  api.post(prmpt, api.PROMPT_PLAN_GEN).then(function(txt) {
+    var jsonCode = convertMdCodeBlocksToJson(txt)[0];
+    if (jsonCode && typeof jsonCode.code != 'undefined') {
+      var output = jsonCode.code;
       
-      rootFs.fromObject(files)
-      updateFilesRender();
+      if (typeof jsonCode.code == 'string' && !jsonCode.code.startsWith('[')) {
+        output = '[' + jsonCode.code;
+      }
+    } else {
+      return genProjectContinue('Format incorrect ( check json code block. ) i think you not used code block use code block eg:- (```json \n [...] \n```). fix it')
+    }
+    // redefine
+    jsonCode = output;
+    editor.setValue(output);
+    let files = JSON.parse(output);
+    console.log(output)
+    
+    rootFs.fromObject(files)
+    updateFilesRender();
+    
+    
+    api.currentHistory.push({
+      role: 'system',
+      content: api.PROMPT_NO_EXP_FILE_GEN()
+    });
+    
+    asyncMap(rootFs.getAllFilesList(), async (item) => {
+      let fileCode = await api.post(`write code for project.` + (item.getLocation() + item.name) + ` \n File Des` + item.des)
+      let convertedCodeBlock = await convertMdCodeBlocksToJson(fileCode)[0].code;
       
-      
-      asyncMap(rootFs.getAllFilesList(), async (item) => {
-        let fileCode = await api.post(`write code for project.` + (item.getLocation() + item.name) + ` \n File Des` + item.des, api.PROMPT_NO_EXP_FILE_GEN())
-        let convertedCodeBlock = await convertMdCodeBlocksToJson(fileCode)[0].code;
-        
-        if (convertedCodeBlock) {
-          item.setContent(convertedCodeBlock);
-          item.status = 'READY'
-          audio.play(audio.CLICK)
-          return convertedCodeBlock
-        }
-      })
-      
+      if (convertedCodeBlock) {
+        item.setContent(convertedCodeBlock);
+        item.status = 'READY'
+        audio.play(audio.CLICK)
+        return convertedCodeBlock
+      }
     })
+    
   })
 }
+
+function genProject(title, des, target) {
+  let oneMore = () => {};
+  api.post(`Create new project with given details. Project must completed. use high format and structures ( professional ). use responsive design. \n Title: ${title} \n Description: ${des} \n Target or Context: ${target}`,
+    api.PROMPT_ENHANCE_PROMPT).then(genProjectContinue)
+}
+
 
 
 function openPrompt() {
